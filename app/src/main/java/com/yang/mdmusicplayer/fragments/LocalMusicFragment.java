@@ -1,5 +1,6 @@
 package com.yang.mdmusicplayer.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,9 +13,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.yang.mdmusicplayer.MusicApplication;
 import com.yang.mdmusicplayer.R;
+import com.yang.mdmusicplayer.activitys.PlayMusicActivity;
 import com.yang.mdmusicplayer.adapters.LocalMusicListAdapter;
 import com.yang.mdmusicplayer.entitys.Audio;
+import com.yang.mdmusicplayer.listeners.RecyclerViewClickListener;
 import com.yang.mdmusicplayer.utils.AudioUtil;
 import com.yang.mdmusicplayer.utils.DialogUtil;
 import com.yang.mdmusicplayer.utils.ToastUtil;
@@ -29,6 +33,10 @@ public class LocalMusicFragment extends BaseFragment {
 
 
     private static final String TAG = "LocalMusicFragment";
+
+
+    private MusicApplication application;
+
     /**
      * 标志位，标志已经初始化完成
      */
@@ -75,8 +83,7 @@ public class LocalMusicFragment extends BaseFragment {
     }
 
     private void initAudioData(){
-        AudioUtil.getInstance(getActivity().getApplication()).initAudioList();
-        mMusicFileNum = AudioUtil.getInstance(getActivity().getApplication()).getmLocalMusicList().size();
+        mMusicFileNum = AudioUtil.getInstance(getActivity().getApplicationContext()).getmLocalMusicList().size();
         Log.i(TAG,""+mMusicFileNum);
         DialogUtil.dismissProgressDialog();
     }
@@ -88,36 +95,35 @@ public class LocalMusicFragment extends BaseFragment {
 
     private void initData(){
         mData = new ArrayList<>();
+        application = (MusicApplication) getActivity().getApplication();
         layoutManager = new LinearLayoutManager(getActivity());
         mAdapter = new LocalMusicListAdapter(getActivity());
         recycler_view.setAdapter(mAdapter);
         recycler_view.setLayoutManager(layoutManager);
-        recycler_view.addOnScrollListener(getOnBottomListener(layoutManager));
 
         getMusicData(false); //刚进入界面先刷新一次
 
-        //刷新时执行的事件
-        swipe.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        //点击事件
+        recycler_view.addOnItemTouchListener(new RecyclerViewClickListener(getActivity(), new RecyclerViewClickListener.OnItemClickListener() {
             @Override
-            public void onRefresh() {
-                getMusicData(true);
+            public void onItemClick(View view, int position) {
+                application.getMusicBinder().startPlay(position, 0);
+                startActivity(new Intent(getActivity(), PlayMusicActivity.class));
             }
-        });
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
     }
 
     private void  getMusicData(boolean isLoadMore){
         try {
             swipe.measure(View.MEASURED_SIZE_MASK, View.MEASURED_HEIGHT_STATE_SHIFT);
             swipe.setRefreshing(true);
-            if(!isLoadMore){
-                mData.clear();
-                contentQuantity =10;
-            }
 
-            if (isLoadMore) {
-                contentQuantity += 10;
-            }
-            mData = AudioUtil.getInstance(getActivity()).getmLocalMusicList().subList(0, contentQuantity<mMusicFileNum?contentQuantity:mMusicFileNum-1);
+            mData = AudioUtil.getInstance(getActivity()).getmLocalMusicList();
             recycler_view.post(new Runnable() {
                 @Override
                 public void run() {
@@ -129,28 +135,7 @@ public class LocalMusicFragment extends BaseFragment {
         }catch (Throwable e){
             e.printStackTrace();
             swipe.setRefreshing(false);
-            ToastUtil.show("到底了");
         }
     }
 
-    RecyclerView.OnScrollListener getOnBottomListener(final RecyclerView.LayoutManager layoutManager) {
-        return new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int lastVisibleItem = ((LinearLayoutManager) layoutManager).findLastVisibleItemPosition();
-                int totalItemCount = layoutManager.getItemCount();
-                //lastVisibleItem >= totalItemCount - 4 表示剩下4个item自动加载，各位自由选择
-                // dy>0 表示向下滑动
-                if (!swipe.isRefreshing() && lastVisibleItem >= totalItemCount - 2 && dy > 0) {
-                    if (!mIsFirstTimeTouchBottom) {
-                        swipe.setRefreshing(true);
-                        getMusicData(true);
-                    } else {
-                        mIsFirstTimeTouchBottom = false;
-                    }
-                }
-            }
-        };
-    }
 }
