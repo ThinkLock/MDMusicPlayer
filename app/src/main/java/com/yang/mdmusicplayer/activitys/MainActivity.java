@@ -1,4 +1,4 @@
-package com.yang.mdmusicplayer;
+package com.yang.mdmusicplayer.activitys;
 
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.yang.mdmusicplayer.R;
 import com.yang.mdmusicplayer.fragments.MainFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {

@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.yang.mdmusicplayer.MainActivity;
+import com.yang.mdmusicplayer.activitys.MainActivity;
 import com.yang.mdmusicplayer.R;
 import com.yang.mdmusicplayer.adapters.MainPageAdapter;
 

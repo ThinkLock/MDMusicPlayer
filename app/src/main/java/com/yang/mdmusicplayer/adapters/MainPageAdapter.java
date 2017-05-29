@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.yang.mdmusicplayer.R;
 import com.yang.mdmusicplayer.fragments.LocalMusicFragment;
+import com.yang.mdmusicplayer.fragments.NetMusicFragment;
 
 /**
  * Created by Yang on 2016/9/5.
@@ -29,7 +30,7 @@ public class MainPageAdapter extends FragmentPagerAdapter {
                 result = new LocalMusicFragment();
                 break;
             case 1:
-                result = new LocalMusicFragment();
+                result = new NetMusicFragment();
                 break;
         }
 

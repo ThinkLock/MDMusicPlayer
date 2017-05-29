@@ -2,5 +2,5 @@
     <string name="app_name">MDMusicPlayer</string>
     <string name="action_settings">Settings</string>
     <string name="drawer_menu_1">本地音乐</string>
-    <string name="drawer_menu_2">网路音乐</string>
+    <string name="drawer_menu_2">在线音乐</string>
 </resources>
